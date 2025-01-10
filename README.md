@@ -1,6 +1,6 @@
-Check for specific patterns of git cached files. 
+Check for specific patterns of git cached files.
 
-It can be any string. 
+It can be any string.
 
 Informs the files with those patterns. In addition, set a `precess.exit(1)` `error` until the patterns is not found anymore.
 

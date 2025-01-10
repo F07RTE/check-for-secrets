@@ -58,7 +58,7 @@ function ValidateArguments(arguments) {
     process.stdout.write("\n\nUsage:\n");
     process.stdout.write("help - show avaliable parameters\n");
     process.stdout.write(
-      "git-cached - looks for the cached files and check for not allowed patterns\n"
+      "git-cached - looks for the cached files and check for not allowed patterns\n",
     );
     process.stdout.write("\n\n");
 
@@ -73,7 +73,7 @@ function GetConfigParameters() {
     checkForSecretsConfig = require("../../checkforsecrets.config.json");
   } catch (error) {
     console.log(
-      "Using standard config. You can add your own config by creating a `checkforsecrets.config.json` file on your main directory.\n"
+      "Using standard config. You can add your own config by creating a `checkforsecrets.config.json` file on your main directory.\n",
     );
   }
 
@@ -93,7 +93,7 @@ async function checkForGitCachedFiles(ignoredFiles, patterns) {
 
       if (files.length <= 1) {
         process.stdout.write(
-          "\n\n🟡 No git cached files found. You must `git add` the changed files, so they can be checked. 🤔\n\n"
+          "\n\n🟡 No git cached files found. You must `git add` the changed files, so they can be checked. 🤔\n\n",
         );
         process.exit(0);
       }
@@ -118,7 +118,7 @@ async function checkForGitCachedFiles(ignoredFiles, patterns) {
             for (let index = 0; index < regexResult.length; index++) {
               const patternFound = regexResult[index];
               notAllowedFiles.push(
-                filePath + " | string match: " + patternFound
+                filePath + " | string match: " + patternFound,
               );
             }
           }
@@ -131,7 +131,7 @@ async function checkForGitCachedFiles(ignoredFiles, patterns) {
     process.stdout.write("Error when running git-cached validation.\n");
     if (process.stderr.find("usage: git diff [<options>]")) {
       process.stdout.write(
-        "Invallid git diff cached command. Contact the creator for help.\n"
+        "Invallid git diff cached command. Contact the creator for help.\n",
       );
       process.exit(1);
     }
@@ -139,7 +139,7 @@ async function checkForGitCachedFiles(ignoredFiles, patterns) {
     if (
       process.stderr.find("git: command not found") ||
       process.stderr.find(
-        "'git' is not recognized as an internal or external command"
+        "'git' is not recognized as an internal or external command",
       )
     ) {
       process.stdout.write("Make sure git is installed in your system.\n");
