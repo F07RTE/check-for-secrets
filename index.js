@@ -3,7 +3,7 @@ const fs = require("fs");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 
-const parameters = ["help", "git-cached"];
+const parameters = ["help", "git-cached", "all-files"];
 
 async function checkForSecrets() {
   let arguments = process.argv.slice(2);
@@ -15,8 +15,12 @@ async function checkForSecrets() {
   const ignoredFiles = checkForSecretsConfig.ignoredFiles;
   const patterns = checkForSecretsConfig.patterns;
 
-  if (arguments[0].indexOf(parameters[1]) >= 0) {
+  if (arguments[0] === "git-cached") {
     return checkForGitCachedFiles(ignoredFiles, patterns);
+  }
+
+  if (arguments[0] === "all-files") {
+    return checkForAllFiles(ignoredFiles, patterns);
   }
 }
 
@@ -145,5 +149,39 @@ async function checkForGitCachedFiles(ignoredFiles, patterns) {
       process.stdout.write("Make sure git is installed in your system.\n");
       process.exit(1);
     }
+  }
+}
+
+async function checkForAllFiles(ignoredFiles, patterns) {
+  process.stdout.write("🟡 Looking for all files in the repository...\n");
+
+  try {
+    let notAllowedFiles = [];
+    let { stdout } = await exec("git ls-files");
+
+    let files = stdout.split("\n").filter((file) => file.trim() !== "");
+
+    for (const filePath of files) {
+      if (ignoredFiles.includes(filePath)) {
+        console.log("ignored file: ", filePath);
+        continue;
+      }
+
+      const data = await fs.promises.readFile(filePath, "utf8");
+
+      for (const pattern of patterns) {
+        const regex = new RegExp(pattern, "i");
+        const regexResult = regex.exec(data);
+
+        if (regexResult) {
+          notAllowedFiles.push(`${filePath} | string match: ${regexResult[0]}`);
+        }
+      }
+    }
+
+    return notAllowedFiles;
+  } catch (error) {
+    console.error("Error when checking all files:", error);
+    process.exit(1);
   }
 }
