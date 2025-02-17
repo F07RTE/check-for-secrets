@@ -64,6 +64,9 @@ function ValidateArguments(arguments) {
     process.stdout.write(
       "git-cached - looks for the cached files and check for not allowed patterns\n",
     );
+    process.stdout.write(
+      "all-files - looks for all files and check for not allowed patterns\n",
+    );
     process.stdout.write("\n\n");
 
     process.exit(0);
