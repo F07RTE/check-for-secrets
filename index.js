@@ -112,6 +112,10 @@ async function checkForGitCachedFiles(ignoredFiles, patterns) {
           continue;
         }
 
+        if (!fs.existsSync(filePath)) {
+          continue;
+        }
+
         const data = await fs.promises.readFile(filePath, "utf8");
 
         for (let index = 0; index < patterns.length; index++) {
