@@ -1,4 +1,4 @@
-Check for specific patterns of git cached files.
+Check for specific patterns on git cached files.
 
 It can be any string.
 
