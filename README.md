@@ -86,4 +86,4 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ## License
 
-ISC © 2024 Guilherme Forte
+MIT © 2024 Guilherme Forte
