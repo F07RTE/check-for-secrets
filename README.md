@@ -5,6 +5,7 @@ A Node.js CLI tool to detect sensitive patterns (like passwords, keys, or secret
 ---
 
 ## Features
+
 - Scans for configurable patterns (e.g., `password`, `key`, `secret`).
 - Works on staged (git-cached) or all files in the repo.
 - Fails with a clear error if any forbidden patterns are found.
@@ -78,6 +79,7 @@ npx check-for-secrets git-cached
 ---
 
 ## Contributing
+
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
 ---
