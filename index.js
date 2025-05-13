@@ -2,27 +2,9 @@
 const fs = require("fs");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
+const { findPatternsInText } = require("./lib/checkForSecrets");
 
 const parameters = ["help", "git-cached", "all-files"];
-
-async function checkForSecrets() {
-  let arguments = process.argv.slice(2);
-
-  ValidateArguments(arguments);
-
-  let checkForSecretsConfig = GetConfigParameters();
-
-  const ignoredFiles = checkForSecretsConfig.ignoredFiles;
-  const patterns = checkForSecretsConfig.patterns;
-
-  if (arguments[0] === "git-cached") {
-    return checkForGitCachedFiles(ignoredFiles, patterns);
-  }
-
-  if (arguments[0] === "all-files") {
-    return checkForAllFiles(ignoredFiles, patterns);
-  }
-}
 
 (async () => {
   process.stdout.write("\n🟡 Checking for not allowed patterns\n");
@@ -44,6 +26,25 @@ async function checkForSecrets() {
   process.stdout.write("\n\n🟢 No bad patterns found 🙂\n\n");
   process.exit(0);
 })();
+
+async function checkForSecrets() {
+  let arguments = process.argv.slice(2);
+
+  ValidateArguments(arguments);
+
+  let checkForSecretsConfig = GetConfigParameters();
+
+  const ignoredFiles = checkForSecretsConfig.ignoredFiles;
+  const patterns = checkForSecretsConfig.patterns;
+
+  if (arguments[0] === "git-cached") {
+    return checkForGitCachedFiles(ignoredFiles, patterns);
+  }
+
+  if (arguments[0] === "all-files") {
+    return checkForAllFiles(ignoredFiles, patterns);
+  }
+}
 
 function ValidateArguments(arguments) {
   if (arguments.length <= 0 || arguments[0] === null) {
@@ -121,18 +122,10 @@ async function checkForGitCachedFiles(ignoredFiles, patterns) {
 
         const data = await fs.promises.readFile(filePath, "utf8");
 
-        for (let index = 0; index < patterns.length; index++) {
-          const regex = new RegExp(patterns[index], "i");
-          let regexResult = regex.exec(data);
+        notAllowedFiles = findPatternsInText(filePath, data, patterns);
 
-          if (regexResult != null && regexResult.length > 0) {
-            for (let index = 0; index < regexResult.length; index++) {
-              const patternFound = regexResult[index];
-              notAllowedFiles.push(
-                filePath + " | string match: " + patternFound,
-              );
-            }
-          }
+        if (notAllowedFiles.length > 0) {
+          return notAllowedFiles;
         }
       }
 
