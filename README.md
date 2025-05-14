@@ -8,6 +8,8 @@ A Node.js CLI tool to detect sensitive patterns (like passwords, keys, or secret
 
 - Scans for configurable patterns (e.g., `password`, `key`, `secret`).
 - Works on staged (git-cached) or all files in the repo.
+- Ignores files and directories configured in `checkforsecrets.config.json` (including `node_modules` and `dist` by default).
+- Robust pattern scanning with improved matching logic.
 - Fails with a clear error if any forbidden patterns are found.
 - Easily integrates with Husky for pre-commit or pre-push hooks.
 
@@ -60,6 +62,7 @@ Configure ignored files and patterns in `checkforsecrets.config.json`:
 ```json
 {
   "ignoredFiles": ["checkforsecrets.config.json"],
+  "ignoredDirectories": ["node_modules", "dist"],
   "patterns": ["password", "key", "secret"]
 }
 ```
