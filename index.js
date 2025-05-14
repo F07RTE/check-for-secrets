@@ -36,14 +36,15 @@ async function checkForSecrets() {
   let checkForSecretsConfig = GetConfigParameters();
 
   const ignoredFiles = checkForSecretsConfig.ignoredFiles;
+  const ignoredDirectories = checkForSecretsConfig.ignoredDirectories;
   const patterns = checkForSecretsConfig.patterns;
 
   if (arguments[0] === "git-cached") {
-    return checkForGitCachedFiles(ignoredFiles, patterns);
+    return checkForGitCachedFiles(ignoredFiles, ignoredDirectories, patterns);
   }
 
   if (arguments[0] === "all-files") {
-    return checkForAllFiles(ignoredFiles, patterns);
+    return checkForAllFiles(ignoredFiles, ignoredDirectories, patterns);
   }
 
   if (arguments[0] === "add") {
@@ -98,7 +99,11 @@ function GetConfigParameters() {
   return checkForSecretsConfig;
 }
 
-async function checkForGitCachedFiles(ignoredFiles, patterns) {
+async function checkForGitCachedFiles(
+  ignoredFiles,
+  ignoredDirectories,
+  patterns,
+) {
   process.stdout.write("🟡 Looking for git cached files...\n");
   try {
     let notAllowedFiles = [];
@@ -124,13 +129,23 @@ async function checkForGitCachedFiles(ignoredFiles, patterns) {
           continue;
         }
 
+        if (ignoredDirectories.some((dir) => filePath.startsWith(dir))) {
+          console.log(
+            "ignored directories: ",
+            ignoredDirectories.find((dir) => filePath.startsWith(dir)),
+            "->",
+            filePath,
+          );
+          continue;
+        }
+
         if (!fs.existsSync(filePath)) {
           continue;
         }
 
         const data = await fs.promises.readFile(filePath, "utf8");
 
-        notAllowedFiles = findPatternsInText(filePath, data, patterns);
+        notAllowedFiles.push(...findPatternsInText(filePath, data, patterns));
 
         if (notAllowedFiles.length > 0) {
           return notAllowedFiles;
@@ -160,7 +175,7 @@ async function checkForGitCachedFiles(ignoredFiles, patterns) {
   }
 }
 
-async function checkForAllFiles(ignoredFiles, patterns) {
+async function checkForAllFiles(ignoredFiles, ignoredDirectories, patterns) {
   process.stdout.write("🟡 Looking for all files in the repository...\n");
 
   try {
@@ -175,16 +190,19 @@ async function checkForAllFiles(ignoredFiles, patterns) {
         continue;
       }
 
+      if (ignoredDirectories.some((dir) => filePath.startsWith(dir))) {
+        console.log(
+          "ignored directories: ",
+          ignoredDirectories.find((dir) => filePath.startsWith(dir)),
+          "->",
+          filePath,
+        );
+        continue;
+      }
+
       const data = await fs.promises.readFile(filePath, "utf8");
 
-      for (const pattern of patterns) {
-        const regex = new RegExp(pattern, "i");
-        const regexResult = regex.exec(data);
-
-        if (regexResult) {
-          notAllowedFiles.push(`${filePath} | string match: ${regexResult[0]}`);
-        }
-      }
+      notAllowedFiles.push(...findPatternsInText(filePath, data, patterns));
     }
 
     return notAllowedFiles;
