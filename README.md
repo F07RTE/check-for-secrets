@@ -39,6 +39,11 @@ npx check-for-secrets <command>
   ```sh
   npx check-for-secrets all-files
   ```
+- **Add a file to the ignored list:**
+  ```sh
+  npx check-for-secrets add <file-path>
+  ```
+  Adds the specified file to the `ignoredFiles` list in `checkforsecrets.config.json` so it will be skipped in future scans.
 - **Help:**
   ```sh
   npx check-for-secrets help

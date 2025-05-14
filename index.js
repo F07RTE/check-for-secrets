@@ -3,8 +3,9 @@ const fs = require("fs");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const { findPatternsInText } = require("./lib/checkForSecrets");
+const { addFileToIgnoredFilesList } = require("./lib/ignoreFile");
 
-const parameters = ["help", "git-cached", "all-files"];
+const parameters = ["help", "git-cached", "all-files", "add <file-path>"];
 
 (async () => {
   process.stdout.write("\n🟡 Checking for not allowed patterns\n");
@@ -44,6 +45,10 @@ async function checkForSecrets() {
   if (arguments[0] === "all-files") {
     return checkForAllFiles(ignoredFiles, patterns);
   }
+
+  if (arguments[0] === "add") {
+    return addFileToIgnoredFilesList(arguments[1]);
+  }
 }
 
 function ValidateArguments(arguments) {
@@ -63,10 +68,13 @@ function ValidateArguments(arguments) {
     process.stdout.write("\n\nUsage:\n");
     process.stdout.write("help - show avaliable parameters\n");
     process.stdout.write(
-      "git-cached - looks for the cached files and check for not allowed patterns\n",
+      "git-cached - looks for the staged files and check for not allowed patterns\n",
     );
     process.stdout.write(
-      "all-files - looks for all files and check for not allowed patterns\n",
+      "all-files - looks for all files in the repository and check for not allowed patterns\n",
+    );
+    process.stdout.write(
+      "add <file-path> - add file to ignored files list (e.g. check-for-secrets add src/path/to/file.js)\n",
     );
     process.stdout.write("\n\n");
 

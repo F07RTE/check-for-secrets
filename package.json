@@ -1,6 +1,6 @@
 {
   "name": "check-for-secrets",
-  "version": "1.1.11",
+  "version": "1.2.0",
   "description": "Check specific patterns on git-cached files.",
   "main": "index.js",
   "bin": {
